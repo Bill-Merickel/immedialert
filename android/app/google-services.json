@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "42696576814",
+    "firebase_url": "https://emergency-communication-e7117.firebaseio.com",
+    "project_id": "emergency-communication-e7117",
+    "storage_bucket": "emergency-communication-e7117.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:42696576814:android:ab1454f1d19627df41f4bf",
+        "android_client_info": {
+          "package_name": "co.appwiz.emergencycommunication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "42696576814-3nkk5qacjrr7ll56ist2qi035c2r4has.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtoNrLMmggOpKD02yLmd-maN9C9aII-Tw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "42696576814-3nkk5qacjrr7ll56ist2qi035c2r4has.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
