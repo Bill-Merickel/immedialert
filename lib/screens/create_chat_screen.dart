@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:emergencycommunication/services/database_service.dart';
 import 'package:provider/provider.dart';
 import 'package:emergencycommunication/models/user_data.dart';
+import 'package:emergencycommunication/models/group_data.dart';
 
 class CreateChatScreen extends StatefulWidget {
   final List<User> selectedUsers;
@@ -58,8 +59,10 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
         userIds.add(
           Provider.of<UserData>(context, listen: false).currentUserId,
         );
+        final currentGroupId =
+            Provider.of<GroupData>(context, listen: false).currentGroupId;
         Provider.of<DatabaseService>(context, listen: false)
-            .createChat(context, _name, _image, userIds)
+            .createChat(context, _name, _image, userIds, currentGroupId)
             .then((success) {
           if (success) {
             Navigator.pushAndRemoveUntil(

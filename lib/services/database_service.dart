@@ -10,13 +10,20 @@ import 'package:emergencycommunication/services/storage_service.dart';
 import 'package:provider/provider.dart';
 
 class DatabaseService {
-  Future<User> getUser(String userId) async {
-    DocumentSnapshot userDoc = await usersRef.document(userId).get();
+  Future<User> getUser(String userId, String groupId) async {
+    DocumentSnapshot userDoc = await groupsRef
+        .document(groupId)
+        .collection('users')
+        .document(userId)
+        .get();
     return User.fromDoc(userDoc);
   }
 
-  Future<List<User>> searchUsers(String currentUserId, String name) async {
-    QuerySnapshot usersSnap = await usersRef
+  Future<List<User>> searchUsers(
+      String currentUserId, String currentGroupId, String name) async {
+    QuerySnapshot usersSnap = await groupsRef
+        .document(currentGroupId)
+        .collection('users')
         .where('name', isGreaterThanOrEqualTo: name)
         .getDocuments();
     List<User> users = [];
@@ -29,12 +36,42 @@ class DatabaseService {
     return users;
   }
 
-  Future<bool> createChat(
-    BuildContext context,
-    String name,
-    File file,
-    List<String> users,
-  ) async {
+  Future<List<String>> getAllGroupIds() async {
+    QuerySnapshot groupsSnap = await groupsRef.getDocuments();
+    List<String> groupNames = [];
+    groupsSnap.documents.forEach((doc) {
+      groupNames.add(doc.documentID);
+    });
+    return groupNames;
+  }
+
+  Future<String> getGroupId(String groupName) async {
+    QuerySnapshot groupsSnap = await groupsRef.getDocuments();
+    String groupId;
+    groupsSnap.documents.forEach((doc) {
+      if (groupName == doc.data['name']) {
+        groupId = doc.documentID;
+      }
+    });
+    return groupId;
+  }
+
+  Future<List<String>> getGroupAuthenticatedEmails(String groupId) async {
+    List<String> groupAuthenticatedEmails = [];
+    QuerySnapshot eventsQuery = await groupsRef.getDocuments();
+    eventsQuery.documents.forEach((doc) {
+      if (doc.documentID == groupId) {
+        for (int i = 0; i < doc['authenticatedEmails'].length; i++) {
+          String authenticatedEmail = doc['authenticatedEmails'][i].toString();
+          groupAuthenticatedEmails.add(authenticatedEmail);
+        }
+      }
+    });
+    return groupAuthenticatedEmails;
+  }
+
+  Future<bool> createChat(BuildContext context, String name, File file,
+      List<String> users, String groupId) async {
     String imageUrl = await Provider.of<StorageService>(context, listen: false)
         .uploadChatImage(null, file);
 
@@ -44,7 +81,7 @@ class DatabaseService {
     for (String userId in users) {
       memberIds.add(userId);
 
-      User user = await getUser(userId);
+      User user = await getUser(userId, groupId);
       Map<String, dynamic> userMap = {
         'name': user.name,
         'email': user.email,
@@ -54,7 +91,7 @@ class DatabaseService {
 
       readStatus[userId] = false;
     }
-    await chatsRef.add({
+    await groupsRef.document(groupId).collection('chats').add({
       'name': name,
       'imageUrl': imageUrl,
       'recentMessage': 'Chat created',
@@ -67,8 +104,13 @@ class DatabaseService {
     return true;
   }
 
-  void sendChatMessage(Chat chat, Message message) {
-    chatsRef.document(chat.id).collection('messages').add({
+  void sendChatMessage(String groupId, Chat chat, Message message) {
+    groupsRef
+        .document(groupId)
+        .collection('chats')
+        .document(chat.id)
+        .collection('messages')
+        .add({
       'senderId': message.senderId,
       'text': message.text,
       'imageUrl': message.imageUrl,
@@ -76,10 +118,15 @@ class DatabaseService {
     });
   }
 
-  void setChatRead(BuildContext context, Chat chat, bool read) async {
+  void setChatRead(
+      BuildContext context, String groupId, Chat chat, bool read) async {
     String currentUserId =
         Provider.of<UserData>(context, listen: false).currentUserId;
-    chatsRef.document(chat.id).updateData({
+    groupsRef
+        .document(groupId)
+        .collection('chats')
+        .document(chat.id)
+        .updateData({
       'readStatus.$currentUserId': read,
     });
   }

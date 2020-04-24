@@ -3,6 +3,7 @@ import 'package:emergencycommunication/models/user_model.dart';
 import 'package:emergencycommunication/services/database_service.dart';
 import 'package:emergencycommunication/models/user_data.dart';
 import 'package:emergencycommunication/screens/create_chat_screen.dart';
+import 'package:emergencycommunication/models/group_data.dart';
 import 'package:provider/provider.dart';
 
 class SearchUsersScreen extends StatefulWidget {
@@ -25,6 +26,8 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
   Widget build(BuildContext context) {
     final currentUserId =
         Provider.of<UserData>(context, listen: false).currentUserId;
+    final currentGroupId =
+        Provider.of<GroupData>(context, listen: false).currentGroupId;
     return Scaffold(
       appBar: AppBar(
         title: Text('Search Users'),
@@ -68,7 +71,7 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
               if (input.trim().isNotEmpty) {
                 List<User> users =
                     await Provider.of<DatabaseService>(context, listen: false)
-                        .searchUsers(currentUserId, input);
+                        .searchUsers(currentUserId, currentGroupId, input);
                 _selectedUsers.forEach((user) => users.remove(user));
                 setState(() => _users = users);
               }

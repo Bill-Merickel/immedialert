@@ -4,29 +4,35 @@ import 'package:emergencycommunication/services/auth_service.dart';
 import 'package:emergencycommunication/services/database_service.dart';
 import 'package:emergencycommunication/services/storage_service.dart';
 import 'package:emergencycommunication/models/user_data.dart';
+import 'package:emergencycommunication/models/group_data.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
-void main() => runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (_) => UserData(),
-          ),
-          Provider<AuthService>(
-            create: (_) => AuthService(),
-          ),
-          Provider<DatabaseService>(
-            create: (_) => DatabaseService(),
-          ),
-          Provider<StorageService>(
-            create: (_) => StorageService(),
-          ),
-        ],
-        child: MyApp(),
-      ),
-    );
+void main() async {
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => UserData(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => GroupData(),
+        ),
+        Provider<AuthService>(
+          create: (_) => AuthService(),
+        ),
+        Provider<DatabaseService>(
+          create: (_) => DatabaseService(),
+        ),
+        Provider<StorageService>(
+          create: (_) => StorageService(),
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -36,7 +42,7 @@ class MyApp extends StatelessWidget {
       title: 'Emergency Communication',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: Colors.blue,
+        primaryColor: Colors.black,
       ),
       home: StreamBuilder<FirebaseUser>(
         stream: Provider.of<AuthService>(context, listen: false).user,

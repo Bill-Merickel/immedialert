@@ -9,6 +9,7 @@ import 'package:emergencycommunication/services/storage_service.dart';
 import 'package:emergencycommunication/models/message_model.dart';
 import 'package:emergencycommunication/models/user_data.dart';
 import 'package:emergencycommunication/widgets/message_bubble.dart';
+import 'package:emergencycommunication/models/group_data.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -25,12 +26,15 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   bool _isComposingMessage = false;
   DatabaseService _databaseService;
+  String currentGroupId;
 
   @override
   void initState() {
     super.initState();
+    currentGroupId =
+        Provider.of<GroupData>(context, listen: false).currentGroupId;
     _databaseService = Provider.of<DatabaseService>(context, listen: false);
-    _databaseService.setChatRead(context, widget.chat, true);
+    _databaseService.setChatRead(context, currentGroupId, widget.chat, true);
   }
 
   _buildMessageTF() {
@@ -43,7 +47,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: IconButton(
               icon: Icon(
                 Icons.photo,
-                color: Theme.of(context).primaryColor,
+                color: Colors.white,
               ),
               onPressed: () async {
                 File imageFile = await ImagePicker.pickImage(
@@ -61,12 +65,19 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           Expanded(
             child: TextField(
+              cursorColor: Colors.white,
               controller: _messageController,
               textCapitalization: TextCapitalization.sentences,
               onChanged: (messageText) {
                 setState(() => _isComposingMessage = messageText.isNotEmpty);
               },
-              decoration: InputDecoration.collapsed(hintText: 'Send a message'),
+              style: TextStyle(
+                color: Colors.white,
+              ),
+              decoration: InputDecoration.collapsed(
+                hintText: 'Send a message',
+                hintStyle: TextStyle(color: Colors.white),
+              ),
             ),
           ),
           Container(
@@ -75,8 +86,8 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             child: IconButton(
               icon: Icon(
-                Icons.send,
-                color: Theme.of(context).primaryColor,
+                Icons.arrow_upward,
+                color: Colors.white,
               ),
               onPressed: _isComposingMessage
                   ? () => _sendMessage(
@@ -104,13 +115,15 @@ class _ChatScreenState extends State<ChatScreen> {
         imageUrl: imageUrl,
         timestamp: Timestamp.now(),
       );
-      _databaseService.sendChatMessage(widget.chat, message);
+      _databaseService.sendChatMessage(currentGroupId, widget.chat, message);
     }
   }
 
   _buildMessagesStream() {
     return StreamBuilder(
-      stream: chatsRef
+      stream: groupsRef
+          .document(currentGroupId)
+          .collection('chats')
           .document(widget.chat.id)
           .collection('messages')
           .orderBy('timestamp', descending: true)
@@ -123,14 +136,22 @@ class _ChatScreenState extends State<ChatScreen> {
         return Expanded(
           child: GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
-            child: ListView(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10.0,
-                vertical: 20.0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(30.0),
+                ),
               ),
-              physics: AlwaysScrollableScrollPhysics(),
-              reverse: true,
-              children: _buildMessageBubbles(snapshot),
+              child: ListView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10.0,
+                  vertical: 20.0,
+                ),
+                physics: AlwaysScrollableScrollPhysics(),
+                reverse: true,
+                children: _buildMessageBubbles(snapshot),
+              ),
             ),
           ),
         );
@@ -153,10 +174,12 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        _databaseService.setChatRead(context, widget.chat, true);
+        _databaseService.setChatRead(
+            context, currentGroupId, widget.chat, true);
         return Future.value(true);
       },
       child: Scaffold(
+        backgroundColor: Theme.of(context).primaryColor,
         appBar: AppBar(
           title: Text(widget.chat.name),
         ),
@@ -166,7 +189,6 @@ class _ChatScreenState extends State<ChatScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               _buildMessagesStream(),
-              Divider(height: 1.0),
               _buildMessageTF(),
             ],
           ),

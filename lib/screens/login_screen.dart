@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:emergencycommunication/services/auth_service.dart';
+import 'package:emergencycommunication/services/database_service.dart';
+import 'package:emergencycommunication/models/group_data.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
@@ -10,25 +12,11 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _loginFormKey = GlobalKey<FormState>();
-  final _signupFormKey = GlobalKey<FormState>();
   String _name, _email, _password;
-  int _selectedIndex = 0;
 
   _buildLoginForm() {
     return Form(
       key: _loginFormKey,
-      child: Column(
-        children: <Widget>[
-          _buildEmailTF(),
-          _buildPasswordTF(),
-        ],
-      ),
-    );
-  }
-
-  _buildSignupForm() {
-    return Form(
-      key: _signupFormKey,
       child: Column(
         children: <Widget>[
           _buildNameTF(),
@@ -46,6 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
         vertical: 10.0,
       ),
       child: TextFormField(
+        cursorColor: Theme.of(context).primaryColor,
         decoration: const InputDecoration(
           labelText: 'Name',
         ),
@@ -64,6 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
         vertical: 10.0,
       ),
       child: TextFormField(
+        cursorColor: Theme.of(context).primaryColor,
         decoration: const InputDecoration(
           labelText: 'Email',
         ),
@@ -82,6 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
         vertical: 10.0,
       ),
       child: TextFormField(
+        cursorColor: Theme.of(context).primaryColor,
         decoration: const InputDecoration(
           labelText: 'Password',
         ),
@@ -94,16 +85,38 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  getGroupIdFromEmail(String email) async {
+    final databaseService =
+        Provider.of<DatabaseService>(context, listen: false);
+    List<String> groupIds = await databaseService.getAllGroupIds();
+    List<String> groupAuthenticatedEmails;
+    for (var groupId in groupIds) {
+      groupAuthenticatedEmails =
+          await databaseService.getGroupAuthenticatedEmails(groupId);
+      for (var groupAuthenticatedEmail in groupAuthenticatedEmails) {
+        if (email == groupAuthenticatedEmail) {
+          Provider.of<GroupData>(context, listen: false).currentGroupId =
+              groupId;
+        }
+      }
+    }
+  }
+
   _submit() async {
     final authService = Provider.of<AuthService>(context, listen: false);
     try {
-      if (_selectedIndex == 0 && _loginFormKey.currentState.validate()) {
+      if (_loginFormKey.currentState.validate()) {
         _loginFormKey.currentState.save();
-        await authService.logIn(_email, _password);
-      } else if (_selectedIndex == 1 &&
-          _signupFormKey.currentState.validate()) {
-        _signupFormKey.currentState.save();
-        await authService.signUp(_name, _email, _password);
+
+        await getGroupIdFromEmail(_email);
+
+        if (Provider.of<GroupData>(context, listen: false).currentGroupId !=
+            null) {
+          await authService.logIn(_name, _email, _password,
+              Provider.of<GroupData>(context, listen: false).currentGroupId);
+        } else {
+          _showErrorDialog('You are not in bruh');
+        }
       }
     } on PlatformException catch (err) {
       _showErrorDialog(err.message);
@@ -139,56 +152,19 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Welcome!',
+              'Emergency Communication',
               style: TextStyle(
-                fontSize: 30.0,
+                fontSize: 26.0,
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(
-              height: 10.0,
+              height: 40.0,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Container(
-                  width: 150.0,
-                  child: FlatButton(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    color: _selectedIndex == 0 ? Colors.blue : Colors.grey[300],
-                    child: Text(
-                      'Login',
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        color: _selectedIndex == 0 ? Colors.white : Colors.blue,
-                      ),
-                    ),
-                    onPressed: () => setState(() => _selectedIndex = 0),
-                  ),
-                ),
-                Container(
-                  width: 150.0,
-                  child: FlatButton(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    color: _selectedIndex == 1 ? Colors.blue : Colors.grey[300],
-                    child: Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        color: _selectedIndex == 1 ? Colors.white : Colors.blue,
-                      ),
-                    ),
-                    onPressed: () => setState(() => _selectedIndex = 1),
-                  ),
-                ),
-              ],
+            _buildLoginForm(),
+            const SizedBox(
+              height: 20.0,
             ),
-            _selectedIndex == 0 ? _buildLoginForm() : _buildSignupForm(),
-            const SizedBox(height: 20.0),
             Container(
               width: 180.0,
               child: FlatButton(

@@ -7,12 +7,14 @@ admin.initializeApp();
 //
 
 exports.addChatMessage = functions.firestore
-  .document('/chats/{chatId}/messages/{messageId}')
+  .document('/groups/{groupId}/chats/{chatId}/messages/{messageId}')
   .onCreate(async (snapshot, context) => {
+    const groupId = context.params.groupId;
     const chatId = context.params.chatId;
     const messageData = snapshot.data();
     const chatRef = admin
-      .firestore()
+      .firestore().collection('groups')
+      .doc(groupId)
       .collection('chats')
       .doc(chatId);
     const chatDoc = await chatRef.get();
@@ -67,15 +69,17 @@ exports.addChatMessage = functions.firestore
   });
 
 exports.onUpdateUser = functions.firestore
-  .document('/users/{userId}')
+  .document('/groups/{groupId}/users/{userId}')
   .onUpdate(async (snapshot, context) => {
+    const groupId = context.params.groupId;
     const userId = context.params.userId;
     const userData = snapshot.after.data();
     const newToken = userData.token;
 
     // Loop through every chat user is in and update their token
     return admin
-      .firestore()
+      .firestore().collection('groups')
+      .doc(groupId)
       .collection('chats')
       .where('memberIds', 'array-contains', userId)
       .orderBy('recentTimestamp', 'desc')

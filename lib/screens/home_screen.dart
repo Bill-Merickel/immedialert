@@ -6,9 +6,9 @@ import 'package:emergencycommunication/models/user_data.dart';
 import 'package:emergencycommunication/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergencycommunication/models/chat_model.dart';
+import 'package:emergencycommunication/models/group_data.dart';
 import 'package:emergencycommunication/screens/chat_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -17,18 +17,22 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  bool hasLoadedGroupId = false;
 
   @override
   void initState() {
     super.initState();
+    getGroupIdFromUserId(
+        Provider.of<UserData>(context, listen: false).currentUserId);
+
     _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) {
+      onMessage: (Map<String, dynamic> message) async {
         print('On message $message');
       },
-      onResume: (Map<String, dynamic> message) {
+      onResume: (Map<String, dynamic> message) async {
         print('On resume $message');
       },
-      onLaunch: (Map<String, dynamic> message) {
+      onLaunch: (Map<String, dynamic> message) async {
         print('On launch $message');
       },
     );
@@ -42,7 +46,25 @@ class _HomeScreenState extends State<HomeScreen> {
     _firebaseMessaging.onIosSettingsRegistered.listen((settings) {
       print('Settings registered: $settings');
     });
-    Provider.of<AuthService>(context, listen: false).updateToken();
+  }
+
+  getGroupIdFromUserId(String userId) async {
+    QuerySnapshot groupsSnap = await groupsRef.getDocuments();
+    groupsSnap.documents.forEach((groupDoc) async {
+      QuerySnapshot anotherSnapshot = await groupsRef
+          .document(groupDoc.documentID)
+          .collection('users')
+          .getDocuments();
+      anotherSnapshot.documents.forEach((userDoc) async {
+        if (userDoc.documentID == userId) {
+          Provider.of<GroupData>(context, listen: false).currentGroupId =
+              groupDoc.documentID;
+          setState(() {
+            hasLoadedGroupId = true;
+          });
+        }
+      });
+    });
   }
 
   _buildChat(Chat chat, String currentUserId) {
@@ -51,11 +73,6 @@ class _HomeScreenState extends State<HomeScreen> {
       fontWeight: isRead ? FontWeight.w400 : FontWeight.bold,
     );
     return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: Colors.white,
-        radius: 28.0,
-        backgroundImage: CachedNetworkImageProvider(chat.imageUrl),
-      ),
       title: Text(
         chat.name,
         overflow: TextOverflow.ellipsis,
@@ -96,50 +113,87 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final String currentUserId =
         Provider.of<UserData>(context, listen: false).currentUserId;
+    String currentGroupId =
+        Provider.of<GroupData>(context, listen: false).currentGroupId;
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.exit_to_app),
-          onPressed: Provider.of<AuthService>(context, listen: false).logOut,
+        title: Text(
+          'Chats',
+          style: TextStyle(
+            fontSize: 26.0,
+          ),
         ),
-        title: Text('Chats'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => SearchUsersScreen(),
-              ),
+            icon: Icon(
+              Icons.exit_to_app,
+              size: 26.0,
             ),
+            onPressed: () {
+              Provider.of<AuthService>(context, listen: false)
+                  .logOut(currentGroupId);
+            },
           ),
         ],
       ),
-      body: StreamBuilder(
-        stream: Firestore.instance
-            .collection('chats')
-            .where('memberIds', arrayContains: currentUserId)
-            .orderBy('recentTimestamp', descending: true)
-            .snapshots(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          return ListView.separated(
-            itemBuilder: (BuildContext context, int index) {
-              Chat chat = Chat.fromDoc(snapshot.data.documents[index]);
-              return _buildChat(chat, currentUserId);
-            },
-            separatorBuilder: (BuildContext context, int index) {
-              return const Divider(
-                thickness: 1.0,
-              );
-            },
-            itemCount: snapshot.data.documents.length,
-          );
-        },
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30.0),
+            topRight: Radius.circular(30.0),
+          ),
+        ),
+        child: hasLoadedGroupId
+            ? StreamBuilder(
+                stream: Firestore.instance
+                    .collection('groups')
+                    .document(currentGroupId)
+                    .collection('chats')
+                    .where('memberIds', arrayContains: currentUserId)
+                    .orderBy('recentTimestamp', descending: true)
+                    .snapshots(),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                    ),
+                    child: ListView.separated(
+                      itemBuilder: (BuildContext context, int index) {
+                        Chat chat =
+                            Chat.fromDoc(snapshot.data.documents[index]);
+                        return _buildChat(chat, currentUserId);
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const Divider(
+                          thickness: 1.0,
+                        );
+                      },
+                      itemCount: snapshot.data.documents.length,
+                    ),
+                  );
+                },
+              )
+            : Center(
+                child: CircularProgressIndicator(),
+              ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SearchUsersScreen(),
+          ),
+        ),
+        tooltip: 'Create New Chat',
+        backgroundColor: Colors.black,
+        child: const Icon(Icons.add),
       ),
     );
   }
