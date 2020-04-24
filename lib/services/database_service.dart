@@ -1,12 +1,10 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:emergencycommunication/models/user_model.dart';
-import 'package:emergencycommunication/models/message_model.dart';
 import 'package:emergencycommunication/models/chat_model.dart';
+import 'package:emergencycommunication/models/message_model.dart';
 import 'package:emergencycommunication/models/user_data.dart';
+import 'package:emergencycommunication/models/user_model.dart';
 import 'package:emergencycommunication/utilities/constants.dart';
-import 'package:emergencycommunication/services/storage_service.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class DatabaseService {
@@ -45,17 +43,6 @@ class DatabaseService {
     return groupNames;
   }
 
-  Future<String> getGroupId(String groupName) async {
-    QuerySnapshot groupsSnap = await groupsRef.getDocuments();
-    String groupId;
-    groupsSnap.documents.forEach((doc) {
-      if (groupName == doc.data['name']) {
-        groupId = doc.documentID;
-      }
-    });
-    return groupId;
-  }
-
   Future<List<String>> getGroupAuthenticatedEmails(String groupId) async {
     List<String> groupAuthenticatedEmails = [];
     QuerySnapshot eventsQuery = await groupsRef.getDocuments();
@@ -70,11 +57,8 @@ class DatabaseService {
     return groupAuthenticatedEmails;
   }
 
-  Future<bool> createChat(BuildContext context, String name, File file,
-      List<String> users, String groupId) async {
-    String imageUrl = await Provider.of<StorageService>(context, listen: false)
-        .uploadChatImage(null, file);
-
+  Future<bool> createChat(BuildContext context, String name, List<String> users,
+      String groupId) async {
     List<String> memberIds = [];
     Map<String, dynamic> memberInfo = {};
     Map<String, dynamic> readStatus = {};
@@ -93,7 +77,6 @@ class DatabaseService {
     }
     await groupsRef.document(groupId).collection('chats').add({
       'name': name,
-      'imageUrl': imageUrl,
       'recentMessage': 'Chat created',
       'recentSender': '',
       'recentTimestamp': Timestamp.now(),

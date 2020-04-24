@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Chat {
   final String id;
   final String name;
-  final String imageUrl;
   final String recentMessage;
   final String recentSender;
   final Timestamp recentTimestamp;
@@ -14,7 +13,6 @@ class Chat {
   Chat({
     this.id,
     this.name,
-    this.imageUrl,
     this.recentMessage,
     this.recentSender,
     this.recentTimestamp,
@@ -27,7 +25,6 @@ class Chat {
     return Chat(
       id: doc.documentID,
       name: doc['name'],
-      imageUrl: doc['imageUrl'],
       recentMessage: doc['recentMessage'],
       recentSender: doc['recentSender'],
       recentTimestamp: doc['recentTimestamp'],

@@ -1,12 +1,12 @@
+import 'package:emergencycommunication/models/group_data.dart';
+import 'package:emergencycommunication/models/user_data.dart';
 import 'package:emergencycommunication/screens/home_screen.dart';
 import 'package:emergencycommunication/screens/login_screen.dart';
 import 'package:emergencycommunication/services/auth_service.dart';
 import 'package:emergencycommunication/services/database_service.dart';
 import 'package:emergencycommunication/services/storage_service.dart';
-import 'package:emergencycommunication/models/user_data.dart';
-import 'package:emergencycommunication/models/group_data.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() async {

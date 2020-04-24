@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:emergencycommunication/models/group_data.dart';
 import 'package:emergencycommunication/services/auth_service.dart';
 import 'package:emergencycommunication/services/database_service.dart';
-import 'package:emergencycommunication/models/group_data.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   @override

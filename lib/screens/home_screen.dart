@@ -1,13 +1,13 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:emergencycommunication/services/auth_service.dart';
-import 'package:emergencycommunication/screens/search_users_screen.dart';
-import 'package:emergencycommunication/models/user_data.dart';
-import 'package:emergencycommunication/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergencycommunication/models/chat_model.dart';
 import 'package:emergencycommunication/models/group_data.dart';
+import 'package:emergencycommunication/models/user_data.dart';
 import 'package:emergencycommunication/screens/chat_screen.dart';
+import 'package:emergencycommunication/screens/search_users_screen.dart';
+import 'package:emergencycommunication/services/auth_service.dart';
+import 'package:emergencycommunication/utilities/constants.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {

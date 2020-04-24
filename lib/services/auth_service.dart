@@ -1,11 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergencycommunication/models/user_model.dart';
+import 'package:emergencycommunication/utilities/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:emergencycommunication/models/group_data.dart';
-import 'package:emergencycommunication/utilities/constants.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;

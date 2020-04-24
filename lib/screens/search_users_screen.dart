@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:emergencycommunication/models/user_model.dart';
-import 'package:emergencycommunication/services/database_service.dart';
-import 'package:emergencycommunication/models/user_data.dart';
-import 'package:emergencycommunication/screens/create_chat_screen.dart';
 import 'package:emergencycommunication/models/group_data.dart';
+import 'package:emergencycommunication/models/user_data.dart';
+import 'package:emergencycommunication/models/user_model.dart';
+import 'package:emergencycommunication/screens/create_chat_screen.dart';
+import 'package:emergencycommunication/services/database_service.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SearchUsersScreen extends StatefulWidget {

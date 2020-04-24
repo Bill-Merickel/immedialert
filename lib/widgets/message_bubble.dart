@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
 import 'package:emergencycommunication/models/chat_model.dart';
 import 'package:emergencycommunication/models/message_model.dart';
-import 'package:provider/provider.dart';
 import 'package:emergencycommunication/models/user_data.dart';
 import 'package:emergencycommunication/utilities/constants.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MessageBubble extends StatelessWidget {
   final Chat chat;

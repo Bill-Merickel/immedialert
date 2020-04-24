@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:emergencycommunication/utilities/constants.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:uuid/uuid.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class StorageService {
   Future<File> _compressImage(String imageId, File image) async {

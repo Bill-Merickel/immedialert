@@ -1,17 +1,17 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:emergencycommunication/services/database_service.dart';
-import 'package:emergencycommunication/utilities/constants.dart';
-import 'package:flutter/material.dart';
-import 'package:emergencycommunication/models/chat_model.dart';
-import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:emergencycommunication/services/storage_service.dart';
-import 'package:emergencycommunication/models/message_model.dart';
-import 'package:emergencycommunication/models/user_data.dart';
-import 'package:emergencycommunication/widgets/message_bubble.dart';
-import 'package:emergencycommunication/models/group_data.dart';
 import 'dart:async';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emergencycommunication/models/chat_model.dart';
+import 'package:emergencycommunication/models/group_data.dart';
+import 'package:emergencycommunication/models/message_model.dart';
+import 'package:emergencycommunication/models/user_data.dart';
+import 'package:emergencycommunication/services/database_service.dart';
+import 'package:emergencycommunication/services/storage_service.dart';
+import 'package:emergencycommunication/utilities/constants.dart';
+import 'package:emergencycommunication/widgets/message_bubble.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class ChatScreen extends StatefulWidget {
   final Chat chat;
