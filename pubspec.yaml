@@ -37,7 +37,6 @@ dependencies:
   flutter_image_compress: ^0.6.5+1
   image_picker: ^0.6.3+1
   cached_network_image: ^2.0.0
-  shared_preferences: ^0.5.7
 
   intl: ^0.16.1
 
