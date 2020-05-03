@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergencycommunication/models/chat_model.dart';
@@ -13,16 +12,16 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-class ChatScreen extends StatefulWidget {
+class MainStream extends StatefulWidget {
   final Chat chat;
 
-  const ChatScreen(this.chat);
+  const MainStream(this.chat);
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  _MainStreamState createState() => _MainStreamState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _MainStreamState extends State<MainStream> {
   final TextEditingController _messageController = TextEditingController();
   bool _isComposingMessage = false;
   DatabaseService _databaseService;
@@ -68,13 +67,21 @@ class _ChatScreenState extends State<ChatScreen> {
               cursorColor: Colors.white,
               controller: _messageController,
               textCapitalization: TextCapitalization.sentences,
+              enableSuggestions: true,
+              minLines: 1,
+              maxLines: 8,
               onChanged: (messageText) {
                 setState(() => _isComposingMessage = messageText.isNotEmpty);
               },
-              style: TextStyle(color: Colors.white, fontFamily: 'Montserrat'),
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'Montserrat',
+              ),
               decoration: InputDecoration.collapsed(
                 hintText: 'Send a message',
-                hintStyle: TextStyle(color: Colors.white),
+                hintStyle: TextStyle(
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
@@ -170,33 +177,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        _databaseService.setChatRead(
-            context, currentGroupId, widget.chat, true);
-        return Future.value(true);
-      },
-      child: Scaffold(
-        backgroundColor: Theme.of(context).primaryColor,
-        appBar: AppBar(
-          brightness: Brightness.dark,
-          title: Text(
-            widget.chat.name,
-            style: TextStyle(
-              fontFamily: 'Montserrat',
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        body: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              _buildMessagesStream(),
-              _buildMessageTF(),
-            ],
-          ),
+    return SafeArea(
+      child: Container(
+        color: Theme.of(context).primaryColor,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            _buildMessagesStream(),
+            _buildMessageTF(),
+          ],
         ),
       ),
     );

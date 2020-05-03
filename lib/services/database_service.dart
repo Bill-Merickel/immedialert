@@ -58,7 +58,7 @@ class DatabaseService {
   }
 
   Future<bool> createChat(BuildContext context, String name, List<String> users,
-      String groupId) async {
+      bool isMainChat, String groupId) async {
     List<String> memberIds = [];
     Map<String, dynamic> memberInfo = {};
     Map<String, dynamic> readStatus = {};
@@ -77,6 +77,7 @@ class DatabaseService {
     }
     await groupsRef.document(groupId).collection('chats').add({
       'name': name,
+      'isMainChat': isMainChat,
       'recentMessage': 'Chat created',
       'recentSender': '',
       'recentTimestamp': Timestamp.now(),
@@ -85,6 +86,106 @@ class DatabaseService {
       'readStatus': readStatus,
     });
     return true;
+  }
+
+  Future<Chat> createMainChat(BuildContext context, String name,
+      List<String> users, bool isMainChat, String groupId) async {
+    List<String> memberIds = [];
+    Map<String, dynamic> memberInfo = {};
+    Map<String, dynamic> readStatus = {};
+    for (String userId in users) {
+      memberIds.add(userId);
+
+      User user = await getUser(userId, groupId);
+      Map<String, dynamic> userMap = {
+        'name': user.name,
+        'email': user.email,
+        'token': user.token,
+      };
+      memberInfo[userId] = userMap;
+
+      readStatus[userId] = false;
+    }
+    await groupsRef.document(groupId).collection('chats').add({
+      'name': name,
+      'isMainChat': isMainChat,
+      'recentMessage': 'Chat created',
+      'recentSender': '',
+      'recentTimestamp': Timestamp.now(),
+      'memberIds': memberIds,
+      'memberInfo': memberInfo,
+      'readStatus': readStatus,
+    });
+
+    QuerySnapshot querySnapshot =
+        await groupsRef.document(groupId).collection('chats').getDocuments();
+    Chat chat;
+    querySnapshot.documents.forEach((doc) {
+      if (doc['isMainChat'] == true) {
+        chat = Chat.fromDoc(doc);
+      }
+    });
+
+    return chat;
+  }
+
+  Future<bool> addUserToChat(String groupId, Chat chat, String userId) async {
+    List<dynamic> membersIds = [];
+    DocumentSnapshot chatSnapshot = await groupsRef
+        .document(groupId)
+        .collection('chats')
+        .document(chat.id)
+        .get();
+
+    for (var memberId in chatSnapshot['memberIds']) {
+      membersIds.add(memberId);
+    }
+
+    if (!membersIds.contains(userId)) {
+      Map<String, dynamic> memberInfo = {};
+      Map<String, dynamic> readStatus = {};
+
+      membersIds.add(userId);
+
+      User user = await getUser(userId, groupId);
+      Map<String, dynamic> userMap = {
+        'name': user.name,
+        'email': user.email,
+        'token': user.token,
+      };
+      memberInfo[userId] = userMap;
+      readStatus[userId] = false;
+
+      await groupsRef
+          .document(groupId)
+          .collection('chats')
+          .document(chat.id)
+          .setData({
+        'memberIds': membersIds,
+        'memberInfo': memberInfo,
+        'readStatus': readStatus,
+      }, merge: true);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void deleteChat(String groupId, Chat chat) async {
+    DocumentSnapshot chatSnapshot = await groupsRef
+        .document(groupId)
+        .collection('chats')
+        .document(chat.id)
+        .get();
+    chatSnapshot.reference
+        .collection('messages')
+        .getDocuments()
+        .then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.documents) {
+        ds.reference.delete();
+      }
+    });
+    chatSnapshot.reference.delete();
   }
 
   void sendChatMessage(String groupId, Chat chat, Message message) {

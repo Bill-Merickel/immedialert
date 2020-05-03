@@ -29,8 +29,16 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
     final currentGroupId =
         Provider.of<GroupData>(context, listen: false).currentGroupId;
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
-        title: Text('Search Users'),
+        brightness: Brightness.dark,
+        title: Text(
+          'Search Users',
+          style: TextStyle(
+            fontFamily: 'Montserrat',
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
@@ -49,66 +57,93 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: <Widget>[
-          TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(vertical: 15.0),
-              border: InputBorder.none,
-              hintText: 'Search',
-              prefixIcon: Icon(
-                Icons.search,
-                size: 30.0,
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(Icons.clear),
-                onPressed: _clearSearch,
-              ),
-              filled: true,
-            ),
-            onSubmitted: (input) async {
-              if (input.trim().isNotEmpty) {
-                List<User> users =
-                    await Provider.of<DatabaseService>(context, listen: false)
-                        .searchUsers(currentUserId, currentGroupId, input);
-                _selectedUsers.forEach((user) => users.remove(user));
-                setState(() => _users = users);
-              }
-            },
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30.0),
+            topRight: Radius.circular(30.0),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _selectedUsers.length + _users.length,
-              itemBuilder: (BuildContext context, int index) {
-                if (index < _selectedUsers.length) {
-                  // Display selected users
-                  User selectedUser = _selectedUsers[index];
+        ),
+        child: Column(
+          children: <Widget>[
+            TextField(
+              controller: _searchController,
+              cursorColor: Theme.of(context).primaryColor,
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+              ),
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(vertical: 15.0),
+                border: InputBorder.none,
+                hintText: 'Search',
+                hintStyle: TextStyle(
+                  fontFamily: 'Montserrat',
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  size: 30.0,
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: _clearSearch,
+                ),
+                filled: true,
+              ),
+              onSubmitted: (input) async {
+                if (input.trim().isNotEmpty) {
+                  List<User> users =
+                      await Provider.of<DatabaseService>(context, listen: false)
+                          .searchUsers(currentUserId, currentGroupId, input);
+                  _selectedUsers.forEach((user) => users.remove(user));
+                  setState(() => _users = users);
+                }
+              },
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _selectedUsers.length + _users.length,
+                itemBuilder: (BuildContext context, int index) {
+                  if (index < _selectedUsers.length) {
+                    // Display selected users
+                    User selectedUser = _selectedUsers[index];
+                    return ListTile(
+                      title: Text(
+                        selectedUser.name,
+                        style: TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      trailing: Icon(Icons.check_circle),
+                      onTap: () {
+                        _selectedUsers.remove(selectedUser);
+                        _users.insert(0, selectedUser);
+                        setState(() {});
+                      },
+                    );
+                  }
+                  int userIndex = index - _selectedUsers.length;
+                  User user = _users[userIndex];
                   return ListTile(
-                    title: Text(selectedUser.name),
-                    trailing: Icon(Icons.check_circle),
+                    title: Text(
+                      user.name,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                      ),
+                    ),
+                    trailing: Icon(Icons.check_circle_outline),
                     onTap: () {
-                      _selectedUsers.remove(selectedUser);
-                      _users.insert(0, selectedUser);
+                      _selectedUsers.add(user);
+                      _users.remove(user);
                       setState(() {});
                     },
                   );
-                }
-                int userIndex = index - _selectedUsers.length;
-                User user = _users[userIndex];
-                return ListTile(
-                  title: Text(user.name),
-                  trailing: Icon(Icons.check_circle_outline),
-                  onTap: () {
-                    _selectedUsers.add(user);
-                    _users.remove(user);
-                    setState(() {});
-                  },
-                );
-              },
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

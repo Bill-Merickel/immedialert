@@ -23,6 +23,7 @@ class MessageBubble extends StatelessWidget {
         style: TextStyle(
           color: Colors.white,
           fontSize: 15.0,
+          fontFamily: 'Montserrat',
         ),
       ),
     );
@@ -69,6 +70,7 @@ class MessageBubble extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12.0,
                     color: Colors.black54,
+                    fontFamily: 'Montserrat',
                   ),
                 ),
               ),

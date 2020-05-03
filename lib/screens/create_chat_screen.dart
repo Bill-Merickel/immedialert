@@ -1,3 +1,4 @@
+import 'package:awesome_loader/awesome_loader.dart';
 import 'package:emergencycommunication/models/group_data.dart';
 import 'package:emergencycommunication/models/user_data.dart';
 import 'package:emergencycommunication/models/user_model.dart';
@@ -32,7 +33,7 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
       final currentGroupId =
           Provider.of<GroupData>(context, listen: false).currentGroupId;
       Provider.of<DatabaseService>(context, listen: false)
-          .createChat(context, _name, userIds, currentGroupId)
+          .createChat(context, _name, userIds, false, currentGroupId)
           .then((success) {
         if (success) {
           Navigator.pushAndRemoveUntil(
@@ -51,49 +52,84 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create Chat'),
+        brightness: Brightness.dark,
+        title: Text(
+          'Create Chat',
+          style: TextStyle(
+            fontFamily: 'Montserrat',
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            _isLoading
-                ? LinearProgressIndicator(
-                    backgroundColor: Colors.blue[200],
-                    valueColor: const AlwaysStoppedAnimation(
-                      Colors.blue,
+      backgroundColor: Theme.of(context).primaryColor,
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30.0),
+            topRight: Radius.circular(30.0),
+          ),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                _isLoading
+                    ? AwesomeLoader(
+                        loaderType: AwesomeLoader.AwesomeLoader4,
+                        color: Theme.of(context).primaryColor,
+                      )
+                    : AwesomeLoader(
+                        loaderType: AwesomeLoader.AwesomeLoader4,
+                        color: Colors.white,
+                      ),
+                const SizedBox(height: 30.0),
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: TextFormField(
+                    key: _nameFormKey,
+                    cursorColor: Theme.of(context).primaryColor,
+                    decoration: InputDecoration(
+                      labelText: 'Chat Name',
+                      labelStyle: TextStyle(
+                        fontFamily: 'Montserrat',
+                      ),
                     ),
-                  )
-                : const SizedBox.shrink(),
-            const SizedBox(height: 30.0),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: TextFormField(
-                key: _nameFormKey,
-                decoration: InputDecoration(labelText: 'Chat Name'),
-                validator: (input) =>
-                    input.trim().isEmpty ? 'Please enter a chat name' : null,
-                onSaved: (input) => _name = input,
-              ),
-            ),
-            const SizedBox(height: 20.0),
-            Container(
-              width: 180.0,
-              child: FlatButton(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                color: Colors.blue,
-                child: Text(
-                  'Create',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
+                    style: TextStyle(
+                      fontFamily: 'Montserrat',
+                    ),
+                    validator: (input) => input.trim().isEmpty
+                        ? 'Please enter a chat name'
+                        : null,
+                    onSaved: (input) => _name = input,
                   ),
                 ),
-                onPressed: _submit,
-              ),
-            )
-          ],
+                const SizedBox(height: 20.0),
+                Container(
+                  width: 180.0,
+                  child: FlatButton(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    color: Theme.of(context).primaryColor,
+                    child: Text(
+                      'Create',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'Montserrat',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                      ),
+                    ),
+                    onPressed: _submit,
+                  ),
+                ),
+                const SizedBox(
+                  height: 80.0,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

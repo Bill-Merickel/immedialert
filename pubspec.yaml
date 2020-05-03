@@ -37,6 +37,8 @@ dependencies:
   flutter_image_compress: ^0.6.5+1
   image_picker: ^0.6.3+1
   cached_network_image: ^2.0.0
+  awesome_loader: ^0.0.3
+  flutter_platform_widgets: ^0.32.5
 
   intl: ^0.16.1
 
@@ -60,6 +62,16 @@ flutter:
   # assets:
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
+  assets:
+    - images/color_logo_with_background.png
+
+  fonts:
+    - family: Rounded-Elegance
+      fonts:
+        - asset: fonts/Rounded-Elegance.ttf
+    - family: Montserrat
+      fonts:
+        - asset: fonts/Montserrat-Regular.ttf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
