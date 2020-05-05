@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:emergencycommunication/models/group_data.dart';
 import 'package:emergencycommunication/services/auth_service.dart';
 import 'package:emergencycommunication/services/database_service.dart';
@@ -197,8 +198,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        brightness: Brightness.dark,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(10.0),
+        child: AppBar(
+          brightness: Brightness.dark,
+        ),
       ),
       backgroundColor: Theme.of(context).primaryColor,
       body: SingleChildScrollView(
@@ -207,6 +211,23 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                  ),
+                  child: Text(
+                    'You must be part of a group that has been registered with AppWiz to activate your account and use this application.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Montserrat',
+                      fontSize: 12.0,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 40.0,
+                ),
                 Container(
                   width: 274.0,
                   height: 80.0,
@@ -217,11 +238,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   height: 20.0,
                 ),
-                Text(
+                AutoSizeText(
                   'Emergency Communication',
+                  presetFontSizes: [24, 18],
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'Rounded-Elegance',
-                    fontSize: 26.0,
                     color: Colors.white,
                   ),
                 ),

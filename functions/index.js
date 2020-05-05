@@ -40,6 +40,7 @@ exports.addChatMessage = functions.firestore
       const memberInfo = chatData.memberInfo;
       const senderId = messageData.senderId;
       let body = memberInfo[senderId].name;
+      // let notificationCount = 1;
       if (messageData.text !== null) {
         body += `: ${messageData.text}`;
       } else {
@@ -49,7 +50,9 @@ exports.addChatMessage = functions.firestore
       const payload = {
         notification: {
           title: chatData['name'],
-          body: body
+          body: body,
+          sound: 'default',
+          // badge: notificationCount.toString()
         }
       };
       const options = {

@@ -39,6 +39,7 @@ dependencies:
   cached_network_image: ^2.0.0
   awesome_loader: ^0.0.3
   flutter_platform_widgets: ^0.32.5
+  auto_size_text: ^2.1.0
 
   intl: ^0.16.1
 

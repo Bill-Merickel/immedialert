@@ -233,12 +233,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   child: Center(
-                    child: Text(
-                      'No chats available.',
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        fontFamily: 'Montserrat',
-                      ),
+                    child: AwesomeLoader(
+                      loaderType: AwesomeLoader.AwesomeLoader4,
+                      color: Theme.of(context).primaryColor,
                     ),
                   ),
                 );
@@ -253,30 +250,41 @@ class _HomeScreenState extends State<HomeScreen> {
                     Radius.circular(30.0),
                   ),
                 ),
-                child: ListView.separated(
-                  itemBuilder: (BuildContext context, int index) {
-                    Chat chat = Chat.fromDoc(snapshot.data.documents[index]);
-                    if (!chat.isMainChat) {
-                      return _buildChat(chat, currentUserId);
-                    } else {
-                      return null;
-                    }
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    if (index == snapshot.data.documents.length - 2) {
-                      return Visibility(
-                        visible: false,
-                        child: const Divider(
-                          thickness: 1.0,
+                child: (snapshot.data.documents.length > 1)
+                    ? ListView.separated(
+                        itemBuilder: (BuildContext context, int index) {
+                          Chat chat =
+                              Chat.fromDoc(snapshot.data.documents[index]);
+                          if (!chat.isMainChat) {
+                            return _buildChat(chat, currentUserId);
+                          } else {
+                            return null;
+                          }
+                        },
+                        separatorBuilder: (BuildContext context, int index) {
+                          if (index == snapshot.data.documents.length - 2) {
+                            return Visibility(
+                              visible: false,
+                              child: const Divider(
+                                thickness: 1.0,
+                              ),
+                            );
+                          }
+                          return const Divider(
+                            thickness: 1.0,
+                          );
+                        },
+                        itemCount: snapshot.data.documents.length,
+                      )
+                    : Center(
+                        child: Text(
+                          'No chats have been made.',
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontFamily: 'Montserrat',
+                          ),
                         ),
-                      );
-                    }
-                    return const Divider(
-                      thickness: 1.0,
-                    );
-                  },
-                  itemCount: snapshot.data.documents.length,
-                ),
+                      ),
               );
             },
           );
