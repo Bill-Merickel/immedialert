@@ -68,6 +68,9 @@ class _ChatScreenState extends State<ChatScreen> {
               cursorColor: Colors.white,
               controller: _messageController,
               textCapitalization: TextCapitalization.sentences,
+              enableSuggestions: true,
+              minLines: 1,
+              maxLines: 8,
               onChanged: (messageText) {
                 setState(() => _isComposingMessage = messageText.isNotEmpty);
               },
