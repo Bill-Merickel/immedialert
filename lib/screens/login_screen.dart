@@ -239,8 +239,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 20.0,
                 ),
                 AutoSizeText(
-                  'Emergency Communication',
-                  presetFontSizes: [24, 18],
+                  'Immedialert',
+                  presetFontSizes: [32, 24, 18],
                   maxLines: 1,
                   textAlign: TextAlign.center,
                   style: TextStyle(
