@@ -2,7 +2,6 @@ import 'package:awesome_loader/awesome_loader.dart';
 import 'package:emergencycommunication/models/group_data.dart';
 import 'package:emergencycommunication/models/user_data.dart';
 import 'package:emergencycommunication/models/user_model.dart';
-import 'package:emergencycommunication/screens/home_screen.dart';
 import 'package:emergencycommunication/services/database_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -36,13 +35,7 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
           .createChat(context, _name, userIds, false, currentGroupId)
           .then((success) {
         if (success) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (_) => HomeScreen(),
-            ),
-            (Route<dynamic> route) => false,
-          );
+          Navigator.popUntil(context, ModalRoute.withName('/'));
         }
       });
     }

@@ -4,6 +4,7 @@ import 'package:emergencycommunication/models/user_model.dart';
 import 'package:emergencycommunication/screens/create_chat_screen.dart';
 import 'package:emergencycommunication/services/database_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
 class SearchUsersScreen extends StatefulWidget {
@@ -20,6 +21,24 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _searchController.clear());
     setState(() => _users = []);
+  }
+
+  _showAlertDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return PlatformAlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            PlatformDialogAction(
+              child: Text('Ok'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -52,6 +71,9 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
                     ),
                   ),
                 );
+              } else {
+                _showAlertDialog('No Users Selected',
+                    'Select one or more users to create a new chat.');
               }
             },
           ),
@@ -95,7 +117,17 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
                   List<User> users =
                       await Provider.of<DatabaseService>(context, listen: false)
                           .searchUsers(currentUserId, currentGroupId, input);
-                  _selectedUsers.forEach((user) => users.remove(user));
+
+                  List<User> usersToRemove = [];
+                  for (var selectedUser in _selectedUsers) {
+                    for (var user in users) {
+                      if (selectedUser.id == user.id) {
+                        usersToRemove.add(user);
+                      }
+                    }
+                  }
+
+                  users.removeWhere((user) => usersToRemove.contains(user));
                   setState(() => _users = users);
                 }
               },
@@ -125,6 +157,7 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
                   }
                   int userIndex = index - _selectedUsers.length;
                   User user = _users[userIndex];
+
                   return ListTile(
                     title: Text(
                       user.name,

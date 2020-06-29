@@ -33,7 +33,8 @@ class _MainStreamState extends State<MainStream> {
     currentGroupId =
         Provider.of<GroupData>(context, listen: false).currentGroupId;
     _databaseService = Provider.of<DatabaseService>(context, listen: false);
-    _databaseService.setChatRead(context, currentGroupId, widget.chat, true);
+    _databaseService.setChatReadStatus(
+        context, currentGroupId, widget.chat, true);
   }
 
   _buildMessageTF() {

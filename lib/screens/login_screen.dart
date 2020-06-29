@@ -14,11 +14,25 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _loginFormKey = GlobalKey<FormState>();
+  final _signupFormKey = GlobalKey<FormState>();
   String _name, _email, _password;
+  int _selectedIndex = 0;
 
   _buildLoginForm() {
     return Form(
       key: _loginFormKey,
+      child: Column(
+        children: <Widget>[
+          _buildEmailTF(),
+          _buildPasswordTF(),
+        ],
+      ),
+    );
+  }
+
+  _buildSignupForm() {
+    return Form(
+      key: _signupFormKey,
       child: Column(
         children: <Widget>[
           _buildNameTF(),
@@ -136,7 +150,8 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  getGroupIdFromEmail(String email) async {
+  Future<String> getGroupIdFromEmail(String email) async {
+    String retrievedGroupId;
     final databaseService =
         Provider.of<DatabaseService>(context, listen: false);
     List<String> groupIds = await databaseService.getAllGroupIds();
@@ -146,27 +161,40 @@ class _LoginScreenState extends State<LoginScreen> {
           await databaseService.getGroupAuthenticatedEmails(groupId);
       for (var groupAuthenticatedEmail in groupAuthenticatedEmails) {
         if (email == groupAuthenticatedEmail) {
-          Provider.of<GroupData>(context, listen: false).currentGroupId =
-              groupId;
+          retrievedGroupId = groupId;
         }
       }
     }
+    return retrievedGroupId;
   }
 
   _submit() async {
     final authService = Provider.of<AuthService>(context, listen: false);
     try {
-      if (_loginFormKey.currentState.validate()) {
-        _loginFormKey.currentState.save();
-
-        await getGroupIdFromEmail(_email);
+      if (_selectedIndex == 0 && _signupFormKey.currentState.validate()) {
+        _signupFormKey.currentState.save();
+        Provider.of<GroupData>(context, listen: false).currentGroupId =
+            await getGroupIdFromEmail(_email);
 
         if (Provider.of<GroupData>(context, listen: false).currentGroupId !=
             null) {
-          await authService.logIn(_name, _email, _password,
+          await authService.signUp(_name, _email, _password,
               Provider.of<GroupData>(context, listen: false).currentGroupId);
         } else {
-          _showErrorDialog('This user is not authenticated.');
+          _showErrorDialog('This email is not registered with a group.');
+        }
+      } else if (_selectedIndex == 1 && _loginFormKey.currentState.validate()) {
+        _loginFormKey.currentState.save();
+
+        Provider.of<GroupData>(context, listen: false).currentGroupId =
+            await getGroupIdFromEmail(_email);
+
+        if (Provider.of<GroupData>(context, listen: false).currentGroupId !=
+            null) {
+          await authService.logIn(_email, _password,
+              Provider.of<GroupData>(context, listen: false).currentGroupId);
+        } else {
+          _showErrorDialog('This email is not registered with a group.');
         }
       }
     } on PlatformException catch (err) {
@@ -226,7 +254,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 SizedBox(
-                  height: 40.0,
+                  height: 20.0,
                 ),
                 Container(
                   width: 274.0,
@@ -248,10 +276,55 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Colors.white,
                   ),
                 ),
-                const SizedBox(
-                  height: 40.0,
+                SizedBox(
+                  height: 20.0,
                 ),
-                _buildLoginForm(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Container(
+                      width: 150.0,
+                      child: FlatButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Text(
+                          'Sign Up',
+                          style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            color: Colors.white,
+                            fontSize: 22.0,
+                            decoration: _selectedIndex == 0
+                                ? TextDecoration.underline
+                                : TextDecoration.none,
+                          ),
+                        ),
+                        onPressed: () => setState(() => _selectedIndex = 0),
+                      ),
+                    ),
+                    Container(
+                      width: 150.0,
+                      child: FlatButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Text(
+                          'Log In',
+                          style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            color: Colors.white,
+                            fontSize: 22.0,
+                            decoration: _selectedIndex == 1
+                                ? TextDecoration.underline
+                                : TextDecoration.none,
+                          ),
+                        ),
+                        onPressed: () => setState(() => _selectedIndex = 1),
+                      ),
+                    ),
+                  ],
+                ),
+                _selectedIndex == 0 ? _buildSignupForm() : _buildLoginForm(),
                 const SizedBox(
                   height: 20.0,
                 ),
@@ -263,7 +336,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     color: Colors.white,
                     child: Text(
-                      'Sign In',
+                      'Submit',
                       style: TextStyle(
                         fontFamily: 'Montserrat',
                         color: Colors.black,

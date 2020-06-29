@@ -34,7 +34,8 @@ class _ChatScreenState extends State<ChatScreen> {
     currentGroupId =
         Provider.of<GroupData>(context, listen: false).currentGroupId;
     _databaseService = Provider.of<DatabaseService>(context, listen: false);
-    _databaseService.setChatRead(context, currentGroupId, widget.chat, true);
+    _databaseService.setChatReadStatus(
+        context, currentGroupId, widget.chat, true);
   }
 
   _buildMessageTF() {
@@ -175,7 +176,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        _databaseService.setChatRead(
+        _databaseService.setChatReadStatus(
             context, currentGroupId, widget.chat, true);
         return Future.value(true);
       },

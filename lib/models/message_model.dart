@@ -7,6 +7,7 @@ class Message {
   final String imageUrl;
   final Timestamp timestamp;
 
+  // Constructor for Message class
   Message({
     this.id,
     this.senderId,
@@ -15,6 +16,7 @@ class Message {
     this.timestamp,
   });
 
+  // Factory for Message class from a DocumentSnapshot
   factory Message.fromDoc(DocumentSnapshot doc) {
     return Message(
       id: doc.documentID,

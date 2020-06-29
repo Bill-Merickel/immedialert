@@ -24,23 +24,6 @@ class StorageService {
     return downloadUrl;
   }
 
-  Future<String> uploadChatImage(String url, File imageFile) async {
-    String imageId = Uuid().v4();
-    File image = await _compressImage(imageId, imageFile);
-
-    if (url != null) {
-      RegExp exp = RegExp(r'chat_(.*).jpg');
-      imageId = exp.firstMatch(url)[1];
-    }
-
-    String downloadUrl = await _uploadImage(
-      'images/chats/chat_$imageId.jpg',
-      imageId,
-      image,
-    );
-    return downloadUrl;
-  }
-
   Future<String> uploadMessageImage(File imageFile) async {
     String imageId = Uuid().v4();
     File image = await _compressImage(imageId, imageFile);

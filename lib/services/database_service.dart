@@ -22,12 +22,12 @@ class DatabaseService {
     QuerySnapshot usersSnap = await groupsRef
         .document(currentGroupId)
         .collection('users')
-        .where('name', isGreaterThanOrEqualTo: name)
         .getDocuments();
     List<User> users = [];
     usersSnap.documents.forEach((doc) {
       User user = User.fromDoc(doc);
-      if (user.id != currentUserId) {
+      if (user.name.toLowerCase().contains(name.toLowerCase()) &&
+          user.id != currentUserId) {
         users.add(user);
       }
     });
@@ -202,8 +202,8 @@ class DatabaseService {
     });
   }
 
-  void setChatRead(
-      BuildContext context, String groupId, Chat chat, bool read) async {
+  void setChatReadStatus(
+      BuildContext context, String groupId, Chat chat, bool readStatus) async {
     String currentUserId =
         Provider.of<UserData>(context, listen: false).currentUserId;
     groupsRef
@@ -211,7 +211,7 @@ class DatabaseService {
         .collection('chats')
         .document(chat.id)
         .updateData({
-      'readStatus.$currentUserId': read,
+      'readStatus.$currentUserId': readStatus,
     });
   }
 }

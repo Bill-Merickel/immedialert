@@ -22,8 +22,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   bool hasLoadedGroupId = false;
-  bool mainChatSelected = true;
   bool mainChatLoaded = false;
+  bool mainChatSelected = true;
   String groupName;
   Chat mainChat;
 
@@ -305,87 +305,99 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.exit_to_app,
-              size: 26.0,
+          Visibility(
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            visible: hasLoadedGroupId,
+            child: IconButton(
+              icon: Icon(
+                Icons.exit_to_app,
+                size: 26.0,
+              ),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) {
+                    return PlatformAlertDialog(
+                      title: Text('Are you sure you want to sign out?'),
+                      content: Text(
+                          'You\'ll have to sign back in and you won\'t receive background notifications.'),
+                      actions: <Widget>[
+                        PlatformDialogAction(
+                          child: Text('No'),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        PlatformDialogAction(
+                          child: Text('Yes'),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Provider.of<GroupData>(context, listen: false)
+                                .currentGroupId = null;
+                            Provider.of<AuthService>(context, listen: false)
+                                .logOut(currentGroupId);
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
             ),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) {
-                  return PlatformAlertDialog(
-                    title: Text('Are you sure you want to sign out?'),
-                    content: Text(
-                        'You\'ll have to sign back in and you won\'t receive background notifications.'),
-                    actions: <Widget>[
-                      PlatformDialogAction(
-                        child: Text('No'),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      PlatformDialogAction(
-                        child: Text('Yes'),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          Provider.of<GroupData>(context, listen: false)
-                              .currentGroupId = null;
-                          Provider.of<AuthService>(context, listen: false)
-                              .logOut(currentGroupId);
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
           ),
         ],
       ),
       body: Column(
         children: <Widget>[
-          Container(
-            color: Theme.of(context).primaryColor,
-            height: 60.0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                FlatButton(
-                  onPressed: () {
-                    setState(() {
-                      mainChatSelected = true;
-                    });
-                  },
-                  child: Text(
-                    'Main Stream',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Montserrat',
-                      fontSize: 20.0,
-                      decoration: mainChatSelected
-                          ? TextDecoration.underline
-                          : TextDecoration.none,
+          Visibility(
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            visible: hasLoadedGroupId,
+            child: Container(
+              color: Theme.of(context).primaryColor,
+              height: 60.0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  FlatButton(
+                    onPressed: () {
+                      setState(() {
+                        mainChatSelected = true;
+                      });
+                    },
+                    child: Text(
+                      'Main Stream',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'Montserrat',
+                        fontSize: 20.0,
+                        decoration: mainChatSelected
+                            ? TextDecoration.underline
+                            : TextDecoration.none,
+                      ),
                     ),
                   ),
-                ),
-                FlatButton(
-                  onPressed: () {
-                    setState(() {
-                      mainChatSelected = false;
-                    });
-                  },
-                  child: Text(
-                    'Chats',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Montserrat',
-                      fontSize: 20.0,
-                      decoration: !mainChatSelected
-                          ? TextDecoration.underline
-                          : TextDecoration.none,
+                  FlatButton(
+                    onPressed: () {
+                      setState(() {
+                        mainChatSelected = false;
+                      });
+                    },
+                    child: Text(
+                      'Chats',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'Montserrat',
+                        fontSize: 20.0,
+                        decoration: !mainChatSelected
+                            ? TextDecoration.underline
+                            : TextDecoration.none,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           Expanded(

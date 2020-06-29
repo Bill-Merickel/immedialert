@@ -10,10 +10,10 @@ class AuthService {
 
   Stream<FirebaseUser> get user => _auth.onAuthStateChanged;
 
-  Future<void> logIn(
+  Future<void> signUp(
       String name, String email, String password, String groupId) async {
     try {
-      AuthResult authResult = await _auth.signInWithEmailAndPassword(
+      AuthResult authResult = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -30,6 +30,15 @@ class AuthService {
           'token': token,
         });
       }
+    } on PlatformException catch (err) {
+      throw (err);
+    }
+  }
+
+  Future<void> logIn(String email, String password, String groupId) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      updateToken(groupId);
     } on PlatformException catch (err) {
       throw (err);
     }

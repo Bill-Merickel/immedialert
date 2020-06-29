@@ -6,6 +6,7 @@ class User {
   final String email;
   final String token;
 
+  // Constructor for User class
   User({
     this.id,
     this.name,
@@ -13,6 +14,7 @@ class User {
     this.token,
   });
 
+  // Factory for User class from a DocumentSnapshot
   factory User.fromDoc(DocumentSnapshot doc) {
     return User(
       id: doc.documentID,

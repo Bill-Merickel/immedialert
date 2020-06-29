@@ -11,6 +11,7 @@ class Chat {
   final dynamic memberInfo;
   final dynamic readStatus;
 
+  // Constructor for Chat class
   Chat({
     this.id,
     this.name,
@@ -23,6 +24,7 @@ class Chat {
     this.readStatus,
   });
 
+  // Factory for Chat class from a DocumentSnapshot
   factory Chat.fromDoc(DocumentSnapshot doc) {
     return Chat(
       id: doc.documentID,
