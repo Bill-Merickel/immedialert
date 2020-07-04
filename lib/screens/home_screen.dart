@@ -240,6 +240,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 );
               }
+              List<Chat> chats = [];
+              for (var document in snapshot.data.documents) {
+                if (document['isMainChat'] == false) {
+                  chats.add(Chat.fromDoc(document));
+                }
+              }
               return Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: 20.0,
@@ -250,19 +256,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     Radius.circular(30.0),
                   ),
                 ),
-                child: (snapshot.data.documents.length > 1)
+                child: (chats.length > 0)
                     ? ListView.separated(
                         itemBuilder: (BuildContext context, int index) {
-                          Chat chat =
-                              Chat.fromDoc(snapshot.data.documents[index]);
-                          if (!chat.isMainChat) {
-                            return _buildChat(chat, currentUserId);
-                          } else {
-                            return null;
-                          }
+                          Chat chat = chats[index];
+                          return _buildChat(chat, currentUserId);
                         },
                         separatorBuilder: (BuildContext context, int index) {
-                          if (index == snapshot.data.documents.length - 2) {
+                          if (index == chats.length - 1) {
                             return Visibility(
                               visible: false,
                               child: const Divider(
@@ -274,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             thickness: 1.0,
                           );
                         },
-                        itemCount: snapshot.data.documents.length,
+                        itemCount: chats.length,
                       )
                     : Center(
                         child: Text(
