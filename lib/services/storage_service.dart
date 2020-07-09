@@ -24,11 +24,11 @@ class StorageService {
     return downloadUrl;
   }
 
-  Future<String> uploadMessageImage(File imageFile) async {
+  Future<String> uploadMessageImage(File imageFile, String groupId) async {
     String imageId = Uuid().v4();
     File image = await _compressImage(imageId, imageFile);
     String downloadUrl = await _uploadImage(
-      'images/messages/message_$imageId.jpg',
+      '$groupId/images/messages/message_$imageId.jpg',
       imageId,
       image,
     );

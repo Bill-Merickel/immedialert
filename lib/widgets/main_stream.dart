@@ -57,7 +57,7 @@ class _MainStreamState extends State<MainStream> {
                   String imageUrl = await Provider.of<StorageService>(
                     context,
                     listen: false,
-                  ).uploadMessageImage(imageFile);
+                  ).uploadMessageImage(imageFile, currentGroupId);
                   _sendMessage(null, imageUrl);
                 }
               },

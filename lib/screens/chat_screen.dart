@@ -58,7 +58,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   String imageUrl = await Provider.of<StorageService>(
                     context,
                     listen: false,
-                  ).uploadMessageImage(imageFile);
+                  ).uploadMessageImage(imageFile, currentGroupId);
                   _sendMessage(null, imageUrl);
                 }
               },

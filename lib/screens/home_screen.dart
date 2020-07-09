@@ -310,7 +310,6 @@ class _HomeScreenState extends State<HomeScreen> {
             maintainSize: true,
             maintainAnimation: true,
             maintainState: true,
-            visible: hasLoadedGroupId,
             child: IconButton(
               icon: Icon(
                 Icons.exit_to_app,
