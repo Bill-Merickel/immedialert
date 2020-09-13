@@ -5,6 +5,7 @@ import 'package:emergencycommunication/models/group_data.dart';
 import 'package:emergencycommunication/models/user_data.dart';
 import 'package:emergencycommunication/screens/chat_screen.dart';
 import 'package:emergencycommunication/screens/search_users_screen.dart';
+import 'package:emergencycommunication/screens/settings_screen.dart';
 import 'package:emergencycommunication/services/auth_service.dart';
 import 'package:emergencycommunication/services/database_service.dart';
 import 'package:emergencycommunication/utilities/constants.dart';
@@ -311,11 +312,18 @@ class _HomeScreenState extends State<HomeScreen> {
             maintainAnimation: true,
             maintainState: true,
             child: IconButton(
+              splashColor: Colors.red,
               icon: Icon(
                 Icons.exit_to_app,
                 size: 26.0,
               ),
               onPressed: () {
+//                Navigator.push(
+//                  context,
+//                  MaterialPageRoute(
+//                    builder: (_) => SettingsScreen(),
+//                  ),
+//                );
                 showDialog(
                   context: context,
                   builder: (_) {
@@ -356,7 +364,7 @@ class _HomeScreenState extends State<HomeScreen> {
             visible: hasLoadedGroupId,
             child: Container(
               color: Theme.of(context).primaryColor,
-              height: 60.0,
+              height: 45.0,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[

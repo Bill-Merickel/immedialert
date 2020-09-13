@@ -112,7 +112,7 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
                 ),
                 filled: true,
               ),
-              onSubmitted: (input) async {
+              onChanged: (input) async {
                 if (input.trim().isNotEmpty) {
                   List<User> users =
                       await Provider.of<DatabaseService>(context, listen: false)

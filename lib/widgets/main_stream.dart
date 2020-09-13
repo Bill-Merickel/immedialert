@@ -142,6 +142,9 @@ class _MainStreamState extends State<MainStream> {
         return Expanded(
           child: GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
+            onPanDown: (_) {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,

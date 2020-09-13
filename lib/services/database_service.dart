@@ -129,7 +129,7 @@ class DatabaseService {
     return chat;
   }
 
-  Future<bool> addUserToChat(String groupId, Chat chat, String userId) async {
+  void addUserToChat(String groupId, Chat chat, String userId) async {
     List<dynamic> membersIds = [];
     DocumentSnapshot chatSnapshot = await groupsRef
         .document(groupId)
@@ -165,9 +165,32 @@ class DatabaseService {
         'memberInfo': memberInfo,
         'readStatus': readStatus,
       }, merge: true);
-      return true;
-    } else {
-      return false;
+    }
+  }
+
+  // This needs to be checked to see if it works as intended
+  void deleteUserFromChat(String groupId, Chat chat, String userId) async {
+    List<dynamic> membersIds = [];
+    DocumentSnapshot chatSnapshot = await groupsRef
+        .document(groupId)
+        .collection('chats')
+        .document(chat.id)
+        .get();
+
+    for (var memberId in chatSnapshot['memberIds']) {
+      membersIds.add(memberId);
+    }
+
+    if (!membersIds.contains(userId)) {
+      membersIds.remove(userId);
+
+      await groupsRef
+          .document(groupId)
+          .collection('chats')
+          .document(chat.id)
+          .updateData({
+        'memberIds': membersIds,
+      });
     }
   }
 

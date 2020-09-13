@@ -138,6 +138,9 @@ class _ChatScreenState extends State<ChatScreen> {
         return Expanded(
           child: GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
+            onPanDown: (_) {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
