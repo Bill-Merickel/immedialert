@@ -186,7 +186,6 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
         appBar: AppBar(
-          brightness: Brightness.dark,
           title: Text(
             widget.chat.name,
             style: TextStyle(

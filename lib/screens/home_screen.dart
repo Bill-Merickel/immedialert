@@ -97,9 +97,10 @@ class _HomeScreenState extends State<HomeScreen> {
         UniqueKey().toString(),
       ),
       onDismissed: (direction) {
-        Provider.of<DatabaseService>(context, listen: false).deleteChat(
+        Provider.of<DatabaseService>(context, listen: false).deleteUserFromChat(
             Provider.of<GroupData>(context, listen: false).currentGroupId,
-            chat);
+            chat,
+            Provider.of<UserData>(context, listen: false).currentUserId);
       },
       direction: DismissDirection.endToStart,
       background: Container(
@@ -282,6 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Text(
                           'No chats have been made.',
                           style: TextStyle(
+                            color: Theme.of(context).primaryColor,
                             fontSize: 20.0,
                             fontFamily: 'Montserrat',
                           ),
@@ -297,7 +299,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
-        brightness: Brightness.dark,
         title: Text(
           (groupName != null) ? groupName : '',
           style: TextStyle(
@@ -306,54 +307,66 @@ class _HomeScreenState extends State<HomeScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: <Widget>[
-          Visibility(
-            maintainSize: true,
-            maintainAnimation: true,
-            maintainState: true,
-            child: IconButton(
-              splashColor: Colors.red,
-              icon: Icon(
-                Icons.exit_to_app,
-                size: 26.0,
-              ),
-              onPressed: () {
-//                Navigator.push(
-//                  context,
-//                  MaterialPageRoute(
-//                    builder: (_) => SettingsScreen(),
-//                  ),
-//                );
-                showDialog(
-                  context: context,
-                  builder: (_) {
-                    return PlatformAlertDialog(
-                      title: Text('Are you sure you want to sign out?'),
-                      content: Text(
-                          'You\'ll have to sign back in and you won\'t receive background notifications.'),
-                      actions: <Widget>[
-                        PlatformDialogAction(
-                          child: Text('No'),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        PlatformDialogAction(
-                          child: Text('Yes'),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            Provider.of<GroupData>(context, listen: false)
-                                .currentGroupId = null;
-                            Provider.of<AuthService>(context, listen: false)
-                                .logOut(currentGroupId);
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
+        leading: Visibility(
+          maintainSize: true,
+          maintainAnimation: true,
+          maintainState: true,
+          child: IconButton(
+            icon: Icon(
+              Icons.exit_to_app,
+              size: 26.0,
             ),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) {
+                  return PlatformAlertDialog(
+                    title: Text('Are you sure you want to sign out?'),
+                    content: Text(
+                        'You\'ll have to sign back in and you won\'t receive background notifications.'),
+                    actions: <Widget>[
+                      PlatformDialogAction(
+                        child: Text('No'),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      PlatformDialogAction(
+                        child: Text('Yes'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Provider.of<GroupData>(context, listen: false)
+                              .currentGroupId = null;
+                          Provider.of<AuthService>(context, listen: false)
+                              .logOut(currentGroupId);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
           ),
-        ],
+        ),
+        // actions: <Widget>[
+        //   Visibility(
+        //     maintainSize: true,
+        //     maintainAnimation: true,
+        //     maintainState: true,
+        //     child: IconButton(
+        //       icon: Icon(
+        //         Icons.settings,
+        //         size: 26.0,
+        //       ),
+        //       onPressed: () {
+        //         Navigator.push(
+        //           context,
+        //           MaterialPageRoute(
+        //             builder: (_) => SettingsScreen(),
+        //           ),
+        //         );
+        //       },
+        //     ),
+        //   ),
+        // ],
       ),
       body: Column(
         children: <Widget>[
@@ -440,7 +453,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               tooltip: 'Create New Chat',
               backgroundColor: Colors.black,
-              child: const Icon(Icons.add),
+              child: Icon(
+                Icons.add,
+                color: Theme.of(context).accentColor,
+              ),
             ),
     );
   }

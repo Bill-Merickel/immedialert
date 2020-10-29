@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:emergencycommunication/models/group_data.dart';
 import 'package:emergencycommunication/services/auth_service.dart';
 import 'package:emergencycommunication/services/database_service.dart';
@@ -13,9 +14,14 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  // GlobalKeys for the login and signup form
   final _loginFormKey = GlobalKey<FormState>();
   final _signupFormKey = GlobalKey<FormState>();
+
+  // Strings that hold the name, email, and password values
   String _name, _email, _password;
+
+  // Index = 0 if signup is selected, 1 if login is selected
   int _selectedIndex = 0;
 
   _buildLoginForm() {
@@ -43,138 +49,83 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  _buildNameTF() {
+  _buildTF(String name, FormFieldValidator validator, bool obscureText) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
+      padding: EdgeInsets.symmetric(
         horizontal: 30.0,
         vertical: 10.0,
       ),
       child: Theme(
         data: ThemeData(
-          primaryColor: Colors.white,
+          primaryColor: Theme.of(context).accentColor,
         ),
         child: TextFormField(
-          cursorColor: Colors.white,
+          cursorColor: Theme.of(context).accentColor,
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).accentColor,
             fontFamily: 'Montserrat',
           ),
-          decoration: const InputDecoration(
-            labelText: 'Name',
+          decoration: InputDecoration(
+            labelText: name,
             labelStyle: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).accentColor,
               fontFamily: 'Montserrat',
             ),
             enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+              borderSide: BorderSide(color: Theme.of(context).accentColor),
             ),
           ),
-          validator: (input) =>
-              input.trim().isEmpty ? 'Please enter a name' : null,
+          validator: validator,
           // Refactor this
-          onSaved: (input) => _name = input.trim(),
+          onSaved: (input) {
+            if (name == "Name") {
+              _name = input.trim();
+            } else if (name == "Email") {
+              _email = input;
+            } else if (name == "Password") {
+              _password = input;
+            }
+          },
+          obscureText: obscureText,
         ),
       ),
+    );
+  }
+
+  _buildNameTF() {
+    return _buildTF(
+      "Name",
+      (input) => input.trim().isEmpty ? 'Please enter a name' : null,
+      false,
     );
   }
 
   _buildEmailTF() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 30.0,
-        vertical: 10.0,
-      ),
-      child: Theme(
-        data: ThemeData(
-          primaryColor: Colors.white,
-        ),
-        child: TextFormField(
-          cursorColor: Colors.white,
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: 'Montserrat',
-          ),
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(
-            labelText: 'Email',
-            labelStyle: TextStyle(
-              color: Colors.white,
-              fontFamily: 'Montserrat',
-            ),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
-            ),
-          ),
-          validator: (input) =>
-              !input.contains('@') ? 'Please enter a valid email' : null,
-          // Refactor this
-          onSaved: (input) => _email = input,
-        ),
-      ),
+    return _buildTF(
+      "Email",
+      (input) =>
+          EmailValidator.validate(input) ? null : 'Please enter a valid email',
+      false,
     );
   }
 
   _buildPasswordTF() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 30.0,
-        vertical: 10.0,
-      ),
-      child: Theme(
-        data: ThemeData(
-          primaryColor: Colors.white,
-        ),
-        child: TextFormField(
-          cursorColor: Colors.white,
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: 'Montserrat',
-          ),
-          decoration: const InputDecoration(
-            labelText: 'Password',
-            labelStyle: TextStyle(
-              color: Colors.white,
-              fontFamily: 'Montserrat',
-            ),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
-            ),
-          ),
-          validator: (input) =>
-              input.length < 6 ? 'Must be at least 6 characters' : null,
-          // Refactor this
-          onSaved: (input) => _password = input,
-          obscureText: true,
-        ),
-      ),
+    return _buildTF(
+      "Password",
+      (input) => input.length < 6 ? 'Must be at least 6 characters' : null,
+      true,
     );
-  }
-
-  Future<String> getGroupIdFromEmail(String email) async {
-    String retrievedGroupId;
-    final databaseService =
-        Provider.of<DatabaseService>(context, listen: false);
-    List<String> groupIds = await databaseService.getAllGroupIds();
-    List<String> groupAuthenticatedEmails;
-    for (var groupId in groupIds) {
-      groupAuthenticatedEmails =
-          await databaseService.getGroupAuthenticatedEmails(groupId);
-      for (var groupAuthenticatedEmail in groupAuthenticatedEmails) {
-        if (email == groupAuthenticatedEmail) {
-          retrievedGroupId = groupId;
-        }
-      }
-    }
-    return retrievedGroupId;
   }
 
   _submit() async {
     final authService = Provider.of<AuthService>(context, listen: false);
+    final databaseService =
+        Provider.of<DatabaseService>(context, listen: false);
     try {
       if (_selectedIndex == 0 && _signupFormKey.currentState.validate()) {
         _signupFormKey.currentState.save();
         Provider.of<GroupData>(context, listen: false).currentGroupId =
-            await getGroupIdFromEmail(_email);
+            await databaseService.getGroupIdFromEmail(_email);
 
         if (Provider.of<GroupData>(context, listen: false).currentGroupId !=
             null) {
@@ -187,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _loginFormKey.currentState.save();
 
         Provider.of<GroupData>(context, listen: false).currentGroupId =
-            await getGroupIdFromEmail(_email);
+            await databaseService.getGroupIdFromEmail(_email);
 
         if (Provider.of<GroupData>(context, listen: false).currentGroupId !=
             null) {
@@ -240,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.symmetric(
+                  padding: EdgeInsets.symmetric(
                     horizontal: 8.0,
                   ),
                   child: Text(
@@ -249,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                       fontFamily: 'Montserrat',
                       fontSize: 12.0,
-                      color: Colors.white,
+                      color: Theme.of(context).accentColor,
                     ),
                   ),
                 ),
@@ -273,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'Rounded-Elegance',
-                    color: Colors.white,
+                    color: Theme.of(context).accentColor,
                   ),
                 ),
                 SizedBox(
@@ -292,7 +243,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           'Sign Up',
                           style: TextStyle(
                             fontFamily: 'Montserrat',
-                            color: Colors.white,
+                            color: Theme.of(context).accentColor,
                             fontSize: 22.0,
                             decoration: _selectedIndex == 0
                                 ? TextDecoration.underline
@@ -312,7 +263,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           'Log In',
                           style: TextStyle(
                             fontFamily: 'Montserrat',
-                            color: Colors.white,
+                            color: Theme.of(context).accentColor,
                             fontSize: 22.0,
                             decoration: _selectedIndex == 1
                                 ? TextDecoration.underline
@@ -325,7 +276,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
                 _selectedIndex == 0 ? _buildSignupForm() : _buildLoginForm(),
-                const SizedBox(
+                SizedBox(
                   height: 20.0,
                 ),
                 Container(
@@ -334,12 +285,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-                    color: Colors.white,
+                    color: Theme.of(context).accentColor,
                     child: Text(
                       'Submit',
                       style: TextStyle(
                         fontFamily: 'Montserrat',
-                        color: Colors.black,
+                        color: Theme.of(context).primaryColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 20.0,
                       ),

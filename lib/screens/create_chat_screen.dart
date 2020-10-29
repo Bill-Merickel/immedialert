@@ -45,7 +45,6 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        brightness: Brightness.dark,
         title: Text(
           'Create Chat',
           style: TextStyle(

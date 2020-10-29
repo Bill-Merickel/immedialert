@@ -57,6 +57,21 @@ class DatabaseService {
     return groupAuthenticatedEmails;
   }
 
+  Future<String> getGroupIdFromEmail(String email) async {
+    String retrievedGroupId;
+    List<String> groupIds = await getAllGroupIds();
+    List<String> groupAuthenticatedEmails;
+    for (var groupId in groupIds) {
+      groupAuthenticatedEmails = await getGroupAuthenticatedEmails(groupId);
+      for (var groupAuthenticatedEmail in groupAuthenticatedEmails) {
+        if (email == groupAuthenticatedEmail) {
+          retrievedGroupId = groupId;
+        }
+      }
+    }
+    return retrievedGroupId;
+  }
+
   Future<bool> createChat(BuildContext context, String name, List<String> users,
       bool isMainChat, String groupId) async {
     List<String> memberIds = [];
@@ -171,6 +186,9 @@ class DatabaseService {
   // This needs to be checked to see if it works as intended
   void deleteUserFromChat(String groupId, Chat chat, String userId) async {
     List<dynamic> membersIds = [];
+    Map<String, dynamic> memberInfo = {};
+    Map<String, dynamic> readStatus = {};
+
     DocumentSnapshot chatSnapshot = await groupsRef
         .document(groupId)
         .collection('chats')
@@ -181,7 +199,9 @@ class DatabaseService {
       membersIds.add(memberId);
     }
 
-    if (!membersIds.contains(userId)) {
+    for (var memberInfo in chatSnapshot['memberInfo']) {}
+
+    if (membersIds.contains(userId)) {
       membersIds.remove(userId);
 
       await groupsRef

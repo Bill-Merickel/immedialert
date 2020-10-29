@@ -50,7 +50,6 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
-        brightness: Brightness.dark,
         title: Text(
           'Search Users',
           style: TextStyle(
