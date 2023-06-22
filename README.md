@@ -4,10 +4,10 @@ Immedialert is an iOS and Android App built with Flutter that streamlines the pr
 
 
 General App UI Interaction:
-https://github.com/Bill-Merickel/immedialert/assets/20192754/30fa2fe9-1dc0-4e7b-b11c-b186de46846e
+https://github.com/Bill-Merickel/immedialert/assets/20192754/c4b0893a-a927-4858-9c69-c212da1addb0
 
 Push Notification Demo:
-https://github.com/Bill-Merickel/immedialert/assets/20192754/0157f459-e9b6-4147-8d83-6a96d33352b0
+https://github.com/Bill-Merickel/immedialert/assets/20192754/00064926-c831-4f98-82fd-023220103eb9
 
 Main Stream UI:
 ![iVBORw0KGgoAAAANSUhEUgAABaMAAAszCAYAAACIWkB7AAABgmlDQ1BzUkdCIElFQzYxOTY2LTIu-2 copy](https://github.com/Bill-Merickel/immedialert/assets/20192754/03874197-b588-4491-b8b7-4d26d709d84f)
