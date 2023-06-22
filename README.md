@@ -1,16 +1,17 @@
-# emergencycommunication
+# Immedialert
 
-A new Flutter application.
+Immedialert is an iOS and Android App built with Flutter that streamlines the process of emergency communication within school campuses. The app was the primary product for the startup AppWiz, which aimed to improve the communication process within school administrators and faculty members. The app has two designated areas: Main Stream and Chats. Main Stream is an organization wide messaging platform containing all members that is used for urgent messages across the school. Chats allow faculty members to create group chats of their choosing, whether based on classroom regions or other components of their choosing. The app also enables push notifications so every user can stay current with administrator announcements and live communications in the event of an emergency. Videos and screenshots of these functionalities are presented below.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+General App UI Interaction:
+https://github.com/Bill-Merickel/immedialert/assets/20192754/30fa2fe9-1dc0-4e7b-b11c-b186de46846e
 
-A few resources to get you started if this is your first Flutter project:
+Push Notification Demo:
+https://github.com/Bill-Merickel/immedialert/assets/20192754/0157f459-e9b6-4147-8d83-6a96d33352b0
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+Main Stream UI:
+![iVBORw0KGgoAAAANSUhEUgAABaMAAAszCAYAAACIWkB7AAABgmlDQ1BzUkdCIElFQzYxOTY2LTIu-2 copy](https://github.com/Bill-Merickel/immedialert/assets/20192754/03874197-b588-4491-b8b7-4d26d709d84f)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Chats UI:
+![iVBORw0KGgoAAAANSUhEUgAABaMAAAszCAYAAACIWkB7AAABgmlDQ1BzUkdCIElFQzYxOTY2LTIu-2](https://github.com/Bill-Merickel/immedialert/assets/20192754/30912747-07b3-4bd3-815e-73f1097b58fb)
+
